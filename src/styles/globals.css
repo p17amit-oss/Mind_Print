@@ -1,0 +1,149 @@
+/* Mind Print — design direction (BUILD PROMPT Section 12).
+   Dark observatory aesthetic: deep space-blue field (not pure black), fog as
+   animated noise. One accent per meaning:
+     gold  = stakes
+     teal  = calibration
+     white-blue = resolution / fog
+     signal-red = FAKE  |  warm-white = REAL  (fooled)
+   Arcade cabinet in an observatory — if it feels like a lab, it failed. */
+
+:root {
+  /* field */
+  --field: #0a1020;            /* deep space-blue, not pure black */
+  --field-2: #0f1730;
+  --panel: #141d3a;
+  --panel-2: #1b2650;
+  --line: #243059;
+
+  /* meaning accents */
+  --gold: #f5c451;            /* stakes */
+  --teal: #35d6c3;            /* calibration */
+  --whiteblue: #bcd4ff;       /* resolution / fog */
+  --signal-red: #ff4d5e;      /* FAKE */
+  --warm-white: #fff3df;      /* REAL */
+
+  --text: #e9eeff;
+  --text-dim: #93a0c7;
+  --text-faint: #5f6c93;
+
+  --radius: 16px;
+  --radius-sm: 10px;
+
+  /* type: characterful geometric display for numerals/titles; humanist sans body.
+     Swap --font-display for a licensed geometric face (e.g. via next/font). */
+  --font-display: "Space Grotesk", "Eurostile", ui-rounded, system-ui, sans-serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-num: "Space Grotesk", ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: radial-gradient(120% 100% at 50% -10%, var(--field-2), var(--field) 60%);
+  color: var(--text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Mobile-first: one-thumb portrait play, 380px baseline (Section 1). */
+#__next {
+  min-height: 100dvh;
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, .display {
+  font-family: var(--font-display);
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+
+/* tabular figures for all numerals — beautiful numbers are load-bearing */
+.num, .tabular {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+button {
+  font-family: var(--font-body);
+  cursor: pointer;
+  border: none;
+  color: inherit;
+}
+
+a { color: var(--whiteblue); }
+
+.stake { color: var(--gold); }
+.calib { color: var(--teal); }
+.reso  { color: var(--whiteblue); }
+.fake  { color: var(--signal-red); }
+.real  { color: var(--warm-white); }
+
+.screen {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 20px calc(24px + env(safe-area-inset-bottom));
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 20px;
+  border-radius: var(--radius);
+  background: var(--panel-2);
+  color: var(--text);
+  font-size: 17px;
+  font-weight: 600;
+  min-height: 56px; /* one-thumb target */
+  transition: transform 0.08s ease, background 0.15s ease, opacity 0.15s ease;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: linear-gradient(180deg, #2b3a78, #1c2a5c); }
+.btn-gold { background: linear-gradient(180deg, #f5c451, #d9a52f); color: #241a02; }
+.btn-ghost { background: transparent; border: 1px solid var(--line); }
+
+.card {
+  background: linear-gradient(180deg, rgba(27,38,80,0.55), rgba(20,29,58,0.55));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+
+.dim { color: var(--text-dim); }
+.faint { color: var(--text-faint); }
+.center { text-align: center; }
+.stack { display: flex; flex-direction: column; }
+.row { display: flex; align-items: center; }
+.grow { flex: 1; }
+
+.kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+/* Juice: every fog-clear is a 400ms moment (Section 12). */
+@keyframes fog-part { from { opacity: 1; } to { opacity: var(--fog-target, 0.2); } }
+@keyframes pulse-lock { 0%,100% { filter: drop-shadow(0 0 2px var(--whiteblue)); } 50% { filter: drop-shadow(0 0 14px var(--whiteblue)); } }
+@keyframes rise { from { transform: translateY(12px); opacity: 0; } to { transform: none; opacity: 1; } }
+.rise { animation: rise 0.4s cubic-bezier(0.2,0.8,0.2,1) both; }
+
+/* prefers-reduced-motion respected globally (Section 12). */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
