@@ -9,6 +9,7 @@ import { DoubleOrBank } from "@/components/economy/DoubleOrBank";
 import { FormReadout, type FormChipData } from "@/components/session/FormReadout";
 import { ContextTags } from "@/components/session/ContextTags";
 import { DailyCardShare } from "@/components/session/DailyCardShare";
+import { ChestOffer } from "@/components/economy/ChestOffer";
 import { ConsentScreen } from "@/components/onboarding/ConsentScreen";
 import { FogClear } from "@/components/session/FogClear";
 import { api } from "@/lib/client/api";
@@ -31,7 +32,9 @@ interface PlanResp {
   gauntletEventId: string | null;
 }
 
-type Phase = "loading" | "trial" | "dob" | "fog" | "form" | "tags" | "card" | "research" | "bonus" | "done";
+type Phase = "loading" | "trial" | "dob" | "fog" | "form" | "tags" | "card" | "chest" | "research" | "bonus" | "done";
+
+interface ChestOfferData { now_n: number; later_n: number; delay_days: number }
 
 export default function Play() {
   return (
@@ -49,6 +52,7 @@ function PlayFlow() {
   const [wins, setWins] = useState(0);
   const [form, setForm] = useState<FormChipData[]>([]);
   const [promptResearch, setPromptResearch] = useState(false);
+  const [chestOffer, setChestOffer] = useState<ChestOfferData | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const started = useRef(false);
 
@@ -145,12 +149,13 @@ function PlayFlow() {
     return (
       <FogClear
         onDone={async () => {
-          const r = await api<{ form: FormChipData[]; shouldPromptResearch: boolean }>(
+          const r = await api<{ form: FormChipData[]; shouldPromptResearch: boolean; chestOffer: ChestOfferData | null }>(
             "/api/session/complete",
             { body: {} }
           );
           setForm(r.form ?? []);
           setPromptResearch(!!r.shouldPromptResearch);
+          setChestOffer(r.chestOffer ?? null);
           setPhase("form");
         }}
       />
@@ -176,9 +181,13 @@ function PlayFlow() {
     return (
       <DailyCardShare
         sessionId={plan.sessionId}
-        onDone={() => setPhase(promptResearch ? "research" : "done")}
+        onDone={() => setPhase(chestOffer ? "chest" : promptResearch ? "research" : "done")}
       />
     );
+  }
+
+  if (phase === "chest" && chestOffer) {
+    return <ChestOffer offer={chestOffer} onDone={() => setPhase(promptResearch ? "research" : "done")} />;
   }
 
   if (phase === "research") {
