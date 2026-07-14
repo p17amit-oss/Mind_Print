@@ -25,8 +25,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   );
   const dimMap = new Map(dimRows.rows.map((r) => [r.dimension, r]));
 
+  // Today's Form chips; else yesterday's (latest available), per Section 4.1.
   const formRows = await query<{ dimension: string; form_z: number | null; baseline_n: number }>(
-    `SELECT dimension, form_z, baseline_n FROM form_scores WHERE user_id = $1 AND session_date = $2`,
+    `SELECT dimension, form_z, baseline_n FROM form_scores
+      WHERE user_id = $1
+        AND session_date = (
+          SELECT max(session_date) FROM form_scores WHERE user_id = $1 AND session_date <= $2
+        )`,
     [user.id, todayISO()]
   );
   const formMap = new Map(formRows.rows.map((r) => [r.dimension, r]));

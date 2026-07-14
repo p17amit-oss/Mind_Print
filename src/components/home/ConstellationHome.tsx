@@ -113,6 +113,8 @@ function DimensionSheet({
   onSharpen: () => void;
 }) {
   const meta = DIMENSION_META[dim.dimension];
+  // Calibration surfaces only at n>=30 wagers (Section 5).
+  const calibrationResolving = dim.dimension === "calibration" && dim.n_trials < 30;
   return (
     <div
       onClick={onClose}
@@ -126,9 +128,15 @@ function DimensionSheet({
         <p className="kicker">{meta.label}</p>
         <p style={{ margin: "8px 0" }}>{meta.blurb}</p>
         <p className="dim" style={{ marginBottom: 4 }}>{meta.sharpenedBy}</p>
+        {calibrationResolving ? (
+          <p className="calib num" style={{ fontSize: 13, marginBottom: 16 }}>
+            Calibration: resolving — {30 - dim.n_trials} wagers to first reading.
+          </p>
+        ) : (
         <p className="num faint" style={{ fontSize: 12, marginBottom: 16 }}>
           {Math.round(dim.resolution * 100)}% resolved · {dim.n_trials} runs
         </p>
+        )}
         <button className="btn btn-primary" style={{ width: "100%" }} onClick={onSharpen}>
           Sharpen it now
         </button>

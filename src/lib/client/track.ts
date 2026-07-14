@@ -1,8 +1,8 @@
 // Client tracking: fire GA4 (gtag) + mirror server-side via /api/track.
 // Server-only events (fooled_call) are never emitted here.
 import { getDeviceId } from "./device";
-import { DEVICE_HEADER } from "../auth";
-import { SERVER_ONLY_EVENTS, type TrackEventName } from "../tracking";
+import { DEVICE_HEADER } from "../device-const";
+import { SERVER_ONLY_EVENTS, type TrackEventName } from "../tracking-const";
 
 declare global {
   interface Window {

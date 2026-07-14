@@ -4,9 +4,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { randomUUID } from "node:crypto";
 import { queryOne } from "./db";
+import { DEVICE_COOKIE, DEVICE_HEADER } from "./device-const";
 
-export const DEVICE_COOKIE = "mp_device";
-export const DEVICE_HEADER = "x-mp-device";
+export { DEVICE_COOKIE, DEVICE_HEADER };
 const ONE_YEAR = 60 * 60 * 24 * 365;
 
 export interface AppUser {

@@ -149,10 +149,15 @@ function PlayFlow() {
     return (
       <FogClear
         onDone={async () => {
-          const r = await api<{ form: FormChipData[]; shouldPromptResearch: boolean; chestOffer: ChestOfferData | null }>(
-            "/api/session/complete",
-            { body: {} }
-          );
+          const r = await api<{
+            form: FormChipData[];
+            shouldPromptResearch: boolean;
+            chestOffer: ChestOfferData | null;
+            fogDeltas?: { dimension: string; delta: number }[];
+          }>("/api/session/complete", { body: {} });
+          for (const d of r.fogDeltas ?? []) {
+            track("fog_clear_viewed", { dimension: d.dimension, delta: d.delta });
+          }
           setForm(r.form ?? []);
           setPromptResearch(!!r.shouldPromptResearch);
           setChestOffer(r.chestOffer ?? null);

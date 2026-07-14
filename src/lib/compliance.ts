@@ -34,6 +34,16 @@ export const BANNED_FORM_STRINGS: string[] = [
 export const PROFILE_FOOTER =
   "Mind Print measures how you play. It is a game, not a clinical or diagnostic instrument.";
 
+/**
+ * The one sanctioned exception: the REQUIRED footer disclaims clinical use and
+ * therefore contains the otherwise-banned word "clinical". The scanner removes
+ * exactly this phrase before scanning so the mandated copy passes while any
+ * other use of "clinical" still fails.
+ */
+export const ALLOWED_PHRASES: string[] = [
+  "not a clinical or diagnostic instrument",
+];
+
 /** The covenant line, shown verbatim in the gameplay ToS (Section 3). */
 export const COVENANT_LINE = "Institutions see populations. Never people.";
 
@@ -54,7 +64,16 @@ export function scanForBanned(
   scope: "ui" | "form" = "ui"
 ): ComplianceHit[] {
   const banned = scope === "form" ? [...BANNED_UI_STRINGS, ...BANNED_FORM_STRINGS] : BANNED_UI_STRINGS;
-  const hay = text.toLowerCase();
+  let hay = text.toLowerCase();
+  // Blank out sanctioned phrases (keeps indices stable for line reporting).
+  for (const allowed of ALLOWED_PHRASES) {
+    const needle = allowed.toLowerCase();
+    let idx = hay.indexOf(needle);
+    while (idx !== -1) {
+      hay = hay.slice(0, idx) + " ".repeat(needle.length) + hay.slice(idx + needle.length);
+      idx = hay.indexOf(needle, idx + needle.length);
+    }
+  }
   const hits: ComplianceHit[] = [];
   for (const phrase of banned) {
     const needle = phrase.toLowerCase();

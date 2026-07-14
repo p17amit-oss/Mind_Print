@@ -2,6 +2,7 @@
 // Body: { contextTags?: string[] (max 2) }.
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getOrCreateUser } from "@/lib/auth";
+import { query } from "@/lib/db";
 import { completeSession, getTodaySession } from "@/lib/server/sessions";
 import { computeForm, recomputeScores } from "@/lib/server/scoring";
 import { computeTelemetry } from "@/lib/server/telemetry";
@@ -23,9 +24,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     .slice(0, 2);
 
   await completeSession(session.id, tags);
+
+  // Capture resolutions before/after recompute → fog deltas for fog_clear_viewed.
+  const before = await query<{ dimension: string; resolution: number | null }>(
+    `SELECT dimension, resolution FROM dimension_scores WHERE user_id = $1`,
+    [user.id]
+  );
+  const beforeMap = new Map(before.rows.map((r) => [r.dimension, r.resolution ?? 0]));
+
   await recomputeScores(user.id);
   const form = await computeForm(user.id);
   await computeTelemetry(user.id);
+
+  const after = await query<{ dimension: string; resolution: number | null }>(
+    `SELECT dimension, resolution FROM dimension_scores WHERE user_id = $1`,
+    [user.id]
+  );
+  const fogDeltas = after.rows
+    .map((r) => ({
+      dimension: r.dimension,
+      delta: Math.round(((r.resolution ?? 0) - (beforeMap.get(r.dimension) ?? 0)) * 100),
+    }))
+    .filter((d) => d.delta !== 0);
 
   await recordServerEvent({ name: "session_complete", userId: user.id, sessionId: session.id });
   if (tags.length) {
@@ -44,5 +64,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Research prompt is shown once, AFTER the first completed session (adults).
     shouldPromptResearch: consent.shouldPromptResearch,
     chestOffer,
+    fogDeltas,
   });
 }

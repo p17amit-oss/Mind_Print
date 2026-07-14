@@ -1,6 +1,6 @@
 // Thin client fetch wrapper that attaches the device id header.
 import { getDeviceId } from "./device";
-import { DEVICE_HEADER } from "../auth";
+import { DEVICE_HEADER } from "../device-const";
 
 export async function api<T = unknown>(
   path: string,

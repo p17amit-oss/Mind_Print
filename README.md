@@ -67,16 +67,32 @@ Encoded in `src/lib/compliance.ts` and enforced in CI:
 
 - [x] 1. Schema + migrations (+ phase-2 stubs + research views), anonymous auth,
        age gate, consent flows, Airtable sync
-- [ ] 2. Glyph renderer
-- [ ] 3. Trial engine shell (wager → trial → resolution)
-- [ ] 4. Six trials
-- [ ] 5. Staircase + event logging + summary metrics
-- [ ] 6. Scoring job + Form engine + computed telemetry
-- [ ] 7. Constellation + session flow + rotation + chaos + context tags
-- [ ] 8. Double-or-Bank + Chest
-- [ ] 9. Daily share card + share flow
-- [ ] 10. Gauntlet admin + event banner
-- [ ] 11. Tracking + compliance tests + polish
+- [x] 2. Glyph renderer
+- [x] 3. Trial engine shell (wager → trial → resolution)
+- [x] 4. Six trials
+- [x] 5. Staircase + event logging + summary metrics
+- [x] 6. Scoring job + Form engine + computed telemetry
+- [x] 7. Constellation + session flow + rotation + chaos + context tags
+- [x] 8. Double-or-Bank + Chest
+- [x] 9. Daily share card + share flow
+- [x] 10. Gauntlet admin + event banner
+- [x] 11. Tracking + compliance tests + polish
+
+### Notes for ops
+
+- **Computed telemetry location** (spec Section 9 choice): written to the
+  `derived_metrics` JSONB column on `dimension_scores`, under the pseudo-
+  dimensions `composure` and `preferences`.
+- **Audio**: cues are synthesized via WebAudio behind a single `sfx()` API in
+  `src/lib/client/sfx.ts`; swap in Howler-loaded sprites (dependency already
+  installed) without touching call sites when real audio assets land.
+- **Vercel**: set `POSTGRES_URL`, `AIRTABLE_*`, `PIPEDREAM_WEBHOOK_URL`,
+  `NEXT_PUBLIC_GA4_ID`, `ADMIN_TOKEN`, `CRON_SECRET`; crons are in
+  `vercel.json`. Configure a Spend Management alert + auto-pause threshold in
+  the Vercel dashboard as part of deployment (spec Section 1).
+- **Gauntlet week runbook**: `POST /api/admin/gauntlet` with
+  `{action:'create'}` → `{action:'attach', items:[…]}` (provenance-validated) →
+  `{action:'status', status:'live'}`. That route is the whole 48-hour pipeline.
 
 ## Data model
 
