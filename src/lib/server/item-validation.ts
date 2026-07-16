@@ -16,7 +16,10 @@ export interface FooledItemLike {
   generator_model?: string | null;
 }
 
-const VALID_RIGHTS = new Set(["licensed", "public_domain", "commissioned"]);
+/** The only permitted `rights` values for human items — no scraped content. */
+export const VALID_RIGHTS = ["licensed", "public_domain", "commissioned"] as const;
+export type Rights = (typeof VALID_RIGHTS)[number];
+const VALID_RIGHTS_SET = new Set<string>(VALID_RIGHTS);
 
 /** Returns a list of human-readable reasons the item is invalid (empty = OK). */
 export function validateFooledItem(item: FooledItemLike): string[] {
@@ -30,7 +33,7 @@ export function validateFooledItem(item: FooledItemLike): string[] {
   }
 
   if (sourceType === "human") {
-    if (!p.rights || !VALID_RIGHTS.has(p.rights)) {
+    if (!p.rights || !VALID_RIGHTS_SET.has(p.rights)) {
       errors.push(
         `${item.item_id}: human item rights must be licensed|public_domain|commissioned (no scraped content)`
       );

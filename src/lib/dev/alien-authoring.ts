@@ -6,6 +6,7 @@
 // src/lib/server/items.ts (getItemsForTrial returns content verbatim).
 import { DEFAULT_GLYPH, type AlienItem, type GlyphSpec } from "../glyphs/types";
 import { detectRules } from "../glyphs/rule-detect";
+import { airtableCsv } from "./airtable-csv";
 
 export interface Distractor {
   spec: GlyphSpec;
@@ -184,45 +185,16 @@ export function warnings(state: AuthoringState): AuthoringWarning[] {
 }
 
 // ── CSV export matching the Airtable → item_cache sync columns ──────────────
-const CSV_COLUMNS = [
-  "item_id",
-  "trial_type",
-  "content",
-  "design_difficulty",
-  "category",
-  "generator_model",
-  "provenance",
-  "sponsor",
-  "gauntlet_event_id",
-  "status",
-] as const;
-
-function csvCell(v: unknown): string {
-  const s = v == null ? "" : String(v);
-  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-}
-
 export function toCsv(entries: BankEntry[]): string {
-  const rows = [CSV_COLUMNS.join(",")];
-  for (const e of entries) {
-    rows.push(
-      [
-        e.item_id,
-        e.trial_type,
-        JSON.stringify(e.content), // content JSON (asJson() parses it on sync)
-        e.design_difficulty,
-        "", // category
-        "", // generator_model
-        "", // provenance
-        "", // sponsor
-        "", // gauntlet_event_id
-        e.status,
-      ]
-        .map(csvCell)
-        .join(",")
-    );
-  }
-  return rows.join("\n");
+  return airtableCsv(
+    entries.map((e) => ({
+      item_id: e.item_id,
+      trial_type: e.trial_type,
+      content: JSON.stringify(e.content), // content JSON (asJson() parses on sync)
+      design_difficulty: e.design_difficulty,
+      status: e.status,
+    }))
+  );
 }
 
 export function depthBreakdown(entries: BankEntry[]): Record<1 | 2 | 3, number> {

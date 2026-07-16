@@ -30,6 +30,12 @@ yarn-error.log*
 # vercel
 .vercel
 
+# fooled ingestion working banks (local author artifacts; data/samples/ is kept)
+/data/fooled_bank_staged.json
+/data/fooled_bank_approved.json
+/data/fooled_bank.csv
+/data/fooled_rejected.log
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

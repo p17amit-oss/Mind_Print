@@ -1,0 +1,34 @@
+[
+  {
+    "modality": "text",
+    "source_type": "human",
+    "text": "The recipe card is in her handwriting, smudged where the butter got to it.",
+    "fake_quality_tier": 2,
+    "rights": "licensed",
+    "source_ref": "contrib/marta-k-2018"
+  },
+  {
+    "modality": "text",
+    "source_type": "ai",
+    "text": "In today's fast-paced world, embracing the journey of self-discovery unlocks a myriad of transformative possibilities.",
+    "fake_quality_tier": 1,
+    "generator_model": "textgen-a-v2",
+    "created": "2026-01"
+  },
+  {
+    "modality": "image",
+    "source_type": "human",
+    "path": "human_sample.svg",
+    "fake_quality_tier": 3,
+    "rights": "public_domain",
+    "source_ref": "photo/pd-museum-2007"
+  },
+  {
+    "modality": "image",
+    "source_type": "ai",
+    "path": "ai_sample.svg",
+    "fake_quality_tier": 4,
+    "generator_model": "imagegen-x-v4",
+    "created": "2026-01"
+  }
+]

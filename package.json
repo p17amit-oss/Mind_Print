@@ -11,6 +11,8 @@
     "typecheck": "tsc --noEmit",
     "migrate": "tsx scripts/migrate.ts",
     "sync:airtable": "tsx scripts/sync-airtable.ts",
+    "ingest:fooled": "tsx scripts/ingest-fooled-batch.ts",
+    "export:fooled": "tsx scripts/export-fooled-approved.ts",
     "test": "vitest run",
     "test:compliance": "vitest run tests/compliance",
     "compliance:grep": "tsx scripts/compliance-grep.ts"
